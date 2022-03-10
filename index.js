@@ -10,15 +10,15 @@ app.use(express.static('public'));
 // allows cross origin resource sharing
 app.use(cors());
 
-// Routes
-const videosRoutes = require('./routes/videos');
-app.use('/videos', videosRoutes);
+// // Routes
+const videoRoutes = require('./routes/videos');
+app.use('/videos', videoRoutes);
 
 // listen
-app.listen(8080, (err) => {
+app.listen(9000, (err) => {
   if (err) {
     console.error(err);
     return;
   }
-  console.log("server is running on port 8080");
+  console.log("server is running on port 9000");
 })
