@@ -3,50 +3,70 @@ const router = express.Router();
 const fs = require("fs");
 const { v4: uuidv4 } = require('uuid');
 
+
+// function to get videos from JSON file
 const getVideos = () => {
-  const videos = fs.readFileSync('./data/videos.json');
-  return JSON.parse(videos);
+  const vidArr = fs.readFileSync('./data/videos.json');
+  return JSON.parse(vidArr);
 }
 
-const saveVideos = (videos) => {
-  fs.writeFileSync('./data/videos.json', JSON.stringify(videos))
+// function to save video arr to JSON file
+const saveVideos = (vidArr) => {
+  fs.writeFileSync('./data/videos.json', JSON.stringify(vidArr))
+}
+
+// function to create a video obj
+const createVid = (vid) => {
+  return ({
+    "channel": vid.channel,
+    "comments": vid.comments,
+    "description": vid.description,
+    "duration": vid.duration,
+    "id": vid.id,
+    "image": vid.image,
+    "likes": vid.likes,
+    "timestamp": vid.timestamp,
+    "title": vid.title,
+    "video": vid.video,
+    "views": vid.views
+  })
 }
 
 router.route('/')
   .get((_req, res) => {
-    let formattedVideos = getVideos()
-      .map(video => {
+
+    // create modified array of essential info to send to client
+    const vidArr = getVideos()
+      .map(vid => {
         return {
-          "id": video.id,
-          "channel": video.channel,
-          "image": video.image,
-          "title": video.title
+          "id": vid.id,
+          "channel": vid.channel,
+          "image": vid.image,
+          "title": vid.title
         }
       })
-
-    res.status(200).json(formattedVideos)
+    console.log('GET "/" success');
+    console.log('CLIENT_RES: vidArr');
+    res.status(200).json(vidArr)
   })
   .post((req, res) => {
     // Create obj of video Database
-    let formattedVideos = getVideos()
-      .map(video => {
-        return {
-          "channel": video.channel,
-          "comments": video.comments,
-          "description": video.description,
-          "duration": video.duration,
-          "id": video.id,
-          "image": video.image,
-          "likes": video.likes,
-          "timestamp": video.timestamp,
-          "title": video.title,
-          "video": video.video,
-          "views": video.views
-        }
-      })
+    const vidArr = getVideos()
+      .map(vid => createVid(vid))
 
     // Deconstruct POST req from client
     const { title, channel, image, video, description } = req.body;
+
+    // verification of data
+    if (!title && !channel && !image && !video && !description) {
+      console.log('CLIENT_ERROR: Empty req.body');
+      console.log('CLIENT_RES: no Entry recieved');
+      return res.status(204).json({ message: "No entry recieved" });
+    } else if (!title || !channel || !image || !video || !description) {
+      console.log('CLIENT_ERROR: Partial req.body');
+      console.log('CLIENT_RES: Incomplete Entry recieved');
+      return res.status(206).json({ message: "Incomplete entry recieved" });
+    }
 
     // Create timestamp for client POST req
     const timestamp = Date.now();
@@ -67,85 +87,96 @@ router.route('/')
     }
 
     // add new POST Obj to current database Obj
-    formattedVideos.push(newVid);
-    // console.log(formattedVideos);
-    saveVideos(formattedVideos);
+    vidArr.push(newVid);
+    saveVideos(vidArr);
 
-    res.status(200).json(newVid);
+    console.log('POST "/" success');
+    console.log('CLIENT_RES: newVid');
+    res.status(201).json(newVid);
   });
 
 router.get('/:videoId', (req, res) => {
-  const individualVideo = getVideos().find(video => video.id === req.params.videoId);
+  // find video by matching id with req params & set it to const value
+  const vidObj = getVideos()
+    .find(vid => vid.id === req.params.videoId);
 
-  if (!individualVideo) {
-    res.status(404).json({
-      message: "Team not found"
-    })
-    return;
+  // if no video, return 404 error
+  if (!vidObj) {
+    console.log('CLIENT_ERROR: Video not found');
+    console.log('CLIENT_RES: Video not found');
+    return res.status(404).json({ message: "Video not found" });
   }
 
-  res.status(200).json(individualVideo)
+  //send vidObj as response
+  console.log('GET "/:videoId" success');
+  console.log('CLIENT_RES: vidObj');
+  res.status(200).json(vidObj);
 })
 
 router.put('/:videoId/likes', (req, res) => {
 
   // Create obj of video Database
-  let formattedVideos = getVideos()
-    .map(video => {
-      return {
-        "channel": video.channel,
-        "comments": video.comments,
-        "description": video.description,
-        "duration": video.duration,
-        "id": video.id,
-        "image": video.image,
-        "likes": video.likes,
-        "timestamp": video.timestamp,
-        "title": video.title,
-        "video": video.video,
-        "views": video.views
-      }
-    })
+  const vidArr = getVideos()
+    .map(vid => createVid(vid))
 
   // Deconstruct POST req from client
   const { videoId } = req.params;
   const { liked } = req.body;
 
-  const likedVid = formattedVideos.find((vid) => vid.id === videoId);
-  const likedIndex = formattedVideos.findIndex(vid => vid.id === videoId);
+  // create likedVid obj by finding vid id
+  const likedVid = vidArr.find((vid) => vid.id === videoId);
 
+  // if no video, return 404 error
+  if (!likedVid) {
+    console.log('CLIENT_ERROR: Video not found');
+    console.log('CLIENT_RES: Video not found');
+    res.status(404).json({ message: "Video not found" });
+    return;
+  }
+
+  // find index value of likedVid
+  const likedIndex = vidArr.findIndex(vid => vid.id === videoId);
+
+  // if the video is previously liked, reduce like by 1 and vice versa 
   liked === false ? likedVid.likes++ : likedVid.likes--;
 
-  formattedVideos.splice(likedIndex, 1, likedVid);
+  //remove previous video value and replace it with new video
+  vidArr.splice(likedIndex, 1, likedVid);
+  saveVideos(vidArr);
 
-  saveVideos(formattedVideos);
-
-  const resp = [!liked, likedVid]
-  res.status(200).json(resp);
+  //create response file & send response
+  console.log('PUT "/:videoId/likes" success');
+  console.log('CLIENT_RES: respObj');
+  const resp = [!liked, likedVid];
+  res.status(202).json(resp);
 })
 
 router.post('/:videoId/comments', (req, res) => {
 
   // Create obj of video Database
-  let formattedVideos = getVideos()
-    .map(video => {
-      return {
-        "channel": video.channel,
-        "comments": video.comments,
-        "description": video.description,
-        "duration": video.duration,
-        "id": video.id,
-        "image": video.image,
-        "likes": video.likes,
-        "timestamp": video.timestamp,
-        "title": video.title,
-        "video": video.video,
-        "views": video.views
-      }
-    })
+  const vidArr = getVideos()
+    .map(vid => createVid(vid))
 
   // Deconstruct POST req from client
   const { id, name, comment } = req.body;
+
+  // create vidObj from going through databaseObj & matching req Id
+  const vidObj = vidArr.find(vid => vid.id === id);
+
+  // verification of data
+  if (!vidObj) {
+    console.log('CLIENT_ERROR: Video not found');
+    console.log('CLIENT_RES: Video not found');
+    return res.status(404).json({ message: "Video not found" });
+  } else if (!name && !id && !comment) {
+    console.log('CLIENT_ERROR: Empty req.body');
+    console.log('CLIENT_RES: no Entry recieved');
+    return res.status(204).json({ message: "Missing entry" });
+  } else if (!name || !id || !comment) {
+    console.log('CLIENT_ERROR: Partial req.body');
+    console.log('CLIENT_RES: Incomplete recieved');
+    return res.status(206).json({ message: "Incomplete entry" });
+  }
 
   // Create timestamp for client POST req
   const timestamp = Date.now();
@@ -159,60 +190,57 @@ router.post('/:videoId/comments', (req, res) => {
     'timestamp': timestamp
   };
 
-  // create vidObj from going through databaseObj & matching req Id
-  const vidObj = formattedVideos.find(vid => vid.id === id);
-
   // push new comment to vidObj
   vidObj.comments.push(newComment);
 
-  const likedIndex = formattedVideos.findIndex(vid => vid.id === id)
-  formattedVideos.splice(likedIndex, 1, vidObj)
+  // find index of video commented and replace old vidObj with new vidObj
+  const vidIndex = vidArr.findIndex(vid => vid.id === id)
+  vidArr.splice(vidIndex, 1, vidObj)
 
   // save new database JSON
-  saveVideos(formattedVideos);
+  saveVideos(vidArr);
 
   // send client vidObj w/ new comment
-  res.status(200).json(vidObj);
+  console.log('POST "/:videoId/comments" success');
+  console.log('CLIENT_RES: vidObj');
+  res.status(201).json(vidObj);
 });
 
 router.delete('/:videoId/comments/:commentId', (req, res) => {
+
   // Create obj of video Database
-  let formattedVideos = getVideos()
-    .map(video => {
-      return {
-        "channel": video.channel,
-        "comments": video.comments,
-        "description": video.description,
-        "duration": video.duration,
-        "id": video.id,
-        "image": video.image,
-        "likes": video.likes,
-        "timestamp": video.timestamp,
-        "title": video.title,
-        "video": video.video,
-        "views": video.views
-      }
-    });
+  const vidArr = getVideos()
+    .map(vid => createVid(vid));
 
   // Deconstruct POST req from client
   const { videoId, commentId } = req.params;
 
   // create vidObj from going through databaseObj & matching param videoId
-  const vidObj = formattedVideos.find(vid => vid.id === videoId);
+  const vidObj = vidArr.find(vid => vid.id === videoId);
+
+  // if no vidObj, return 404 error
+  if (!vidObj) {
+    console.log('CLIENT_ERROR: Video not found');
+    console.log('CLIENT_RES: Video not found');
+    return res.status(404).json({ message: "Video not found" });
+  }
 
   // create newComments obj by filtering all comments not matching comment Id param
-  const newComments = vidObj.comments.filter(comment => comment.id !== commentId);
+  const commentsArr = vidObj.comments.filter(comment => comment.id !== commentId);
 
   // replace old comments with new comments
-  vidObj.comments = newComments;
+  vidObj.comments = commentsArr;
 
-  const likedIndex = formattedVideos.findIndex(vid => vid.id === videoId)
-  formattedVideos.splice(likedIndex, 1, vidObj)
+  // find index of commented vid and replace old vidObj with modified vidObj
+  const vidIndex = vidArr.findIndex(vid => vid.id === videoId);
+  vidArr.splice(vidIndex, 1, vidObj);
 
   // save new database JSON
-  saveVideos(formattedVideos);
+  saveVideos(vidArr);
 
   // send client vidObj w/ new comment
+  console.log('DELETE "/:videoId/comments/:commentId" success');
+  console.log('CLIENT_RES: vidObj');
   res.status(200).json(vidObj);
 })
 
