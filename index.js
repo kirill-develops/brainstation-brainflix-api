@@ -14,7 +14,7 @@ app.use(express.static('public'));
 app.use(cors());
 
 // // Routes
-const videoRoutes = require('./routes/videos');
+const videoRoutes = require('./routes/videos-routes.js');
 app.use('/videos', videoRoutes);
 
 // listen
