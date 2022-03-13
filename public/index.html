@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BrainFlip Api Documentation</title>
+</head>
+<style>
+  scriptHtml {
+    font-family: monospace;
+  }
+
+  h3 {
+    padding-top: 2rem;
+  }
+</style>
+
+<body>
+  <h1>BrainFlix API Documentation</h1>
+  <h2>Endpoints</h2>
+  <h3>GET /videos</h3>
+  <p>Returns an array of video objects</p>
+  <p>Example response:</p>
+  <pre>
+[
+    {   
+        "id": "1af0jruup5gu", 
+        "title": "BMX Rampage: 2018 Highlights", 
+        "channel": "Red Cow", 
+        "image": "https://i.imgur.com/l2Xfgpl.jpg" 
+    },
+    { 
+        "id": "1ainjruutd1j", 
+        "title": "Become A Travel Pro In One Easy Lesson", 
+        "channel": "Todd Welch", 
+        "image": "https://i.imgur.com/5qyCZrD.jpg"
+    }
+]
+  </pre>
+  <h3>POST /videos</h3>
+  <p>Creates a new video post and returns a detailed object of new video</p>
+  <p>Body must include all values</p>
+  <p>Post body response:</p>
+  <pre>
+{
+  "title": "How Bacon can save the World",
+  "channel": "Ron Burgendy",
+  "image": "https://i.imgur.com/l2Xfgpl.jpg",
+  "video": "https://project-2-api.herokuapp.com/stream",
+  "description": "It's salty, smoky, and sweet. It can make almost any dish better. It's bacon, and it's the best meat ever!"
+}
+  </pre>
+  <h3>GET /videos/:videoId</h3>
+  <p>
+    <scriptHtml>:videoID</scriptHtml> must be swapped out with the id of a video as found in the list of videos
+  </p>
+  <p>Returns a detailed object of a single video</p>
+  <p>Details include the list of comments for that video</p>
+  <p>Example response:</p>
+  <pre>
+{ 
+        "id": "1af0jruup5gu",
+        "title": "BMX Rampage: 2018 Highlights",
+        "channel": "Red Cow",
+        "image": "https://i.imgur.com/l2Xfgpl.jpg",
+        "description": "On a gusty day in Southern Utah, a group of 25 daring mountain bikers blew the doors off what is possible on two wheels, unleashing some of the biggest moments the sport has ever seen. While mother nature only allowed for one full run before the conditions made it impossible to ride, that was all that was needed for event veteran Kyle Strait, who won the event for the second time -- eight years after his first Red Cow Rampage title",
+        "views": "1,001,023",
+        "likes": "110,985",
+        "duration": "4:01",
+        "video": "https://project-2-api.herokuapp.com/stream",
+        "timestamp": 1545162149000,
+        "comments": [
+            {
+                "name": "Micheal Lyons",
+                "comment": "They BLEW the ROOF off at their last show, once everyone started figuring out they were going. This is still simply the greatest opening of concert I have EVER witnessed.",
+                "id": "1ab6d9f6-da38-456e-9b09-ab0acd9ce818",
+                "likes": 0,
+                "timestamp": 1545162149000
+            },
+            {
+                "name": "Gary Wong",
+                "comment": "Every time I see him shred I feel so motivated to get off my couch and hop on my board. He’s so talented! I wish I can ride like him one day so I can really enjoy myself!",
+                "id": "cc6f173d-9e9d-4501-918d-bc11f15a8e14",
+                "likes": 0,
+                "timestamp": 1544595784046
+            },
+            {
+                "name": "Theodore Duncan",
+                "comment": "How can someone be so good!!! You can tell he lives for this and loves to do it every day. Everytime I see him I feel instantly happy! He’s definitely my favorite ever!",
+                "id": "993f950f-df99-48e7-bd1e-d95003cc98f1",
+                "likes": 0,
+                "timestamp": 1542262984046
+            }
+        ] 
+}
+  </pre>
+  <h3>PUT /videos/:videoId/likes</h3>
+  <p>
+    <scriptHtml>:videoID</scriptHtml> must be swapped out with the numeric id of a video as found in the list of videos
+  </p>
+  <p>Toggle like counter up or down depending on the state on the client side</p>
+  <p>Returns oppisite LIKED state and a detailed object of LIKED video</p>
+  <h3>POST /videos/:videoId/comments</h3>
+  <p>
+    <scriptHtml>:videoID</scriptHtml> must be swapped out with the numeric id of a video as found in the list of videos
+  </p>
+  <p>Creates a new comment for a specific video</p>
+  <p>Post body response:</p>
+  <pre>
+{
+	"name": "Nigel",
+	"comment": "This is a test"
+}
+</pre>
+  <h3>DELETE /videos/:videoId/comments/:commentId</h3>
+  <p>
+    <scriptHtml>:videoID</scriptHtml> must be swapped out with the numeric ID of a video as found in the list of videos
+  </p>
+  <p>
+    <scriptHtml>:commentID</scriptHtml> must be swapped out with the numeric id of a comment as found in the list of
+    comments for the given video
+  </p>
+  <p>Returns a detailed object of a video with deleted comment</p>
+</body>
+
+</html>
