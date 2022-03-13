@@ -2,7 +2,10 @@ const express = require('express');
 const app = express();
 const cors = require('cors')
 
-// middleware
+// sets port
+const PORT = process.env.PORT || 9000;
+
+// MIDDLEWARE
 // needed to access req.body
 app.use(express.json());
 // access to 'public' folder on the server
@@ -10,15 +13,15 @@ app.use(express.static('public'));
 // allows cross origin resource sharing
 app.use(cors());
 
-// Routes
-const videosRoutes = require('./routes/videos');
-app.use('/videos', videosRoutes);
+// // Routes
+const videoRoutes = require('./routes/videos-routes.js');
+app.use('/videos', videoRoutes);
 
 // listen
-app.listen(8080, (err) => {
+app.listen(PORT, (err) => {
   if (err) {
     console.error(err);
     return;
   }
-  console.log("server is running on port 8080");
+  console.log(`server is running on port ${PORT}`);
 })
