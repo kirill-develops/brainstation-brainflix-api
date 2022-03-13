@@ -66,7 +66,7 @@ exports.addVid = (req, res) => {
     "duration": '0:00',
     "id": uuidv4(),
     "image": image,
-    "likes": '0',
+    "likes": 0,
     "timestamp": timestamp,
     "title": title,
     "video": video,
