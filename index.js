@@ -2,7 +2,10 @@ const express = require('express');
 const app = express();
 const cors = require('cors')
 
-// middleware
+// sets port
+const PORT = process.env.PORT || 9000;
+
+// MIDDLEWARE
 // needed to access req.body
 app.use(express.json());
 // access to 'public' folder on the server
@@ -15,10 +18,10 @@ const videoRoutes = require('./routes/videos');
 app.use('/videos', videoRoutes);
 
 // listen
-app.listen(9000, (err) => {
+app.listen(PORT, (err) => {
   if (err) {
     console.error(err);
     return;
   }
-  console.log("server is running on port 9000");
+  console.log(`server is running on port ${PORT}`);
 })
