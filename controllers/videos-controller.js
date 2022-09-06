@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
-const vidModel = require('../models/videos-model')
+const vidModel = require('../models/videos-model');
 
 // function to create a video obj
 const createVid = (vid) => {
@@ -16,7 +16,7 @@ const createVid = (vid) => {
     "video": vid.video,
     "views": vid.views
   })
-}
+};
 
 
 exports.getAllVids = (_req, res) => {
@@ -30,10 +30,10 @@ exports.getAllVids = (_req, res) => {
         "image": vid.image,
         "title": vid.title
       }
-    })
+    });
   console.log('GET "/" success');
   console.log('CLIENT_RES: vidArr');
-  res.status(200).json(vidArr)
+  res.status(200).json(vidArr);
 };
 
 exports.addVid = (req, res) => {
@@ -191,7 +191,7 @@ exports.addComment = (req, res) => {
   console.log('POST "/:videoId/comments" success');
   console.log('CLIENT_RES: vidObj');
   res.status(201).json(vidObj);
-}
+};
 
 exports.deleteComment = (req, res) => {
 

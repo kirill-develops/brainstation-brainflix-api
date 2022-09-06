@@ -1,6 +1,8 @@
 const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+
 const app = express();
-const cors = require('cors')
 
 // sets port
 const PORT = process.env.PORT || 9000;
@@ -12,8 +14,9 @@ app.use(express.json());
 app.use(express.static('public'));
 // allows cross origin resource sharing
 app.use(cors());
+app.use(helmet());
 
-// // Routes
+// Routes
 const videoRoutes = require('./routes/videos-routes.js');
 app.use('/videos', videoRoutes);
 
