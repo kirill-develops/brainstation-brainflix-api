@@ -13,8 +13,8 @@ app.use(express.json());
 // access to 'public' folder on the server
 app.use(express.static('public'));
 // allows cross origin resource sharing
-app.use(cors());
 app.use(helmet());
+app.use(cors({ origin: true }));
 
 // Routes
 const videoRoutes = require('./routes/videos-routes.js');

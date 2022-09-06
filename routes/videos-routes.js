@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const videoController = require('../controllers/videos-controller');
 
-
 router.route('/')
   .get(videoController.getAllVids)
   .post(videoController.addVid);
