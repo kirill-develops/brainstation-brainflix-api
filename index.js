@@ -22,6 +22,17 @@ app.use(cors(corsOptions));
 const videoRoutes = require("./routes/videos-routes.js");
 app.use("/videos", videoRoutes);
 
+app.use((_req, res) => {
+   return res.status(404).json({ message: "Route not found" });
+});
+
+app.use((err, _req, res, _next) => {
+   console.error(err);
+   return res.status(err.status || 500).json({
+      message: err.status ? err.message : "Internal server error",
+   });
+});
+
 // listen
 app.listen(PORT, (err) => {
    if (err) {
